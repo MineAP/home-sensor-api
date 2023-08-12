@@ -25,6 +25,7 @@ const request = (options: string | URL | http.RequestOptions) => {
 export class DataCollectService {
 
     public startTimer(interval_ms:number) {
+        console.log(`DataCollectService.startTimer() interval=${interval_ms}`)
         this.collectData()
         setInterval(() => {
             this.collectData()
@@ -62,6 +63,8 @@ export class DataCollectService {
                     retoryCount = retoryCount + 1
                     console.log(`re-try ${retoryCount} collectTempAndHumid() ...`)
                     this.collectData(retoryCount)
+                } else {
+                    console.log(`re-try out.`)
                 }
             } else {
                 const log: IRaspiSensorLog = {
@@ -110,8 +113,9 @@ export class DataCollectService {
             }
             const insert = await collections.raspiCameraData?.insertOne(cameraInfo);
             console.log("collectCaptureImage() result:" + JSON.stringify({
+                timestammp: cameraInfo.timestamp,
+                imageLength: cameraInfo.image.length,
                 _id: insert?.insertedId,
-                imageLength: cameraInfo.image.length
             }))
 
         } catch (err) {
