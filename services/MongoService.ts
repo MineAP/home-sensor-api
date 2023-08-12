@@ -26,12 +26,15 @@ export async function connectToDatabase() {
     const cpuInfoCollection: mongoDB.Collection<IRaspiCpuInfo> = db.collection<IRaspiCpuInfo>("raspi_cpu_info")
     const cameraDataCollection: mongoDB.Collection<IRaspiCameraData> = db.collection<IRaspiCameraData>("raspi_camera_data")
  
+    const db_store_expire_day: string = process.env.DB_STORE_EXPIRE_DAY || "7";
+    const db_picture_store_expire_day: string = process.env.DB_STORE_EXPIRE_DAY_FOR_PICT || "7";
+ 
     collections.raspiSensorLogs = sensorLogsCollection
-    collections.raspiSensorLogs.createIndex( { "timestamp": 1 }, { expireAfterSeconds: 60 * 60 * 24 * 7 } )
+    collections.raspiSensorLogs.createIndex( { "timestamp": 1 }, { expireAfterSeconds: 60 * 60 * 24 * Number(db_store_expire_day) } )
     collections.raspiCpuInfo = cpuInfoCollection
-    collections.raspiCpuInfo.createIndex( { "timestamp": 1 }, { expireAfterSeconds: 60 * 60 * 24 * 7 } )
+    collections.raspiCpuInfo.createIndex( { "timestamp": 1 }, { expireAfterSeconds: 60 * 60 * 24 * Number(db_store_expire_day) } )
     collections.raspiCameraData = cameraDataCollection
-    collections.raspiCameraData.createIndex( { "timestamp": 1 }, { expireAfterSeconds: 60 * 60 * 24 * 7 } )
+    collections.raspiCameraData.createIndex( { "timestamp": 1 }, { expireAfterSeconds: 60 * 60 * 24 * Number(db_picture_store_expire_day) } )
        
     console.log(`Successfully connected to database: ${db.databaseName} `);
 }
