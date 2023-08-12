@@ -2,6 +2,7 @@ import * as mongoDB from "mongodb";
 import { IRaspiCameraData, IRaspiCpuInfo, IRaspiSensorLog } from "../models/TestMongoModel"
 import { promises } from "dns";
 import { DataCollectService } from "./DataCollectService";
+import { MongoServerError } from "mongodb";
 
 export const collections: { 
     raspiSensorLogs?: mongoDB.Collection<IRaspiSensorLog>,
@@ -28,15 +29,29 @@ export async function connectToDatabase() {
  
     const db_store_expire_day: string = process.env.DB_STORE_EXPIRE_DAY || "7";
     const db_picture_store_expire_day: string = process.env.DB_STORE_EXPIRE_DAY_FOR_PICT || "7";
- 
-    collections.raspiSensorLogs = sensorLogsCollection
-    collections.raspiSensorLogs.createIndex( { "timestamp": 1 }, { expireAfterSeconds: 60 * 60 * 24 * Number(db_store_expire_day) } )
-    collections.raspiCpuInfo = cpuInfoCollection
-    collections.raspiCpuInfo.createIndex( { "timestamp": 1 }, { expireAfterSeconds: 60 * 60 * 24 * Number(db_store_expire_day) } )
-    collections.raspiCameraData = cameraDataCollection
-    collections.raspiCameraData.createIndex( { "timestamp": 1 }, { expireAfterSeconds: 60 * 60 * 24 * Number(db_picture_store_expire_day) } )
-       
-    console.log(`Successfully connected to database: ${db.databaseName} `);
+
+    console.log(`db_store_expire_day: ${db_store_expire_day} `);
+    console.log(`db_picture_store_expire_day: ${db_picture_store_expire_day} `);
+
+    try {
+
+        collections.raspiSensorLogs = sensorLogsCollection
+        collections.raspiSensorLogs.createIndex( { "timestamp": 1 }, { expireAfterSeconds: 60 * 60 * 24 * Number(db_store_expire_day) } )
+        collections.raspiCpuInfo = cpuInfoCollection
+        collections.raspiCpuInfo.createIndex( { "timestamp": 1 }, { expireAfterSeconds: 60 * 60 * 24 * Number(db_store_expire_day) } )
+        collections.raspiCameraData = cameraDataCollection
+        collections.raspiCameraData.createIndex( { "timestamp": 1 }, { expireAfterSeconds: 60 * 60 * 24 * Number(db_picture_store_expire_day) } )
+        
+        console.log(`Successfully connected to database: ${db.databaseName} `);
+
+    } catch (error) {
+        if (error instanceof MongoServerError && error.codeName == "IndexOptionsConflict") {
+            await collections.raspiSensorLogs?.dropIndex("timestamp_1")
+            await collections.raspiCpuInfo?.dropIndex("timestamp_1")
+            await collections.raspiCameraData?.dropIndex("timestamp_1")
+        }
+        throw error
+    }
 }
 
 
