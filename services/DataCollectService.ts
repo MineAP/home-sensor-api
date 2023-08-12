@@ -59,8 +59,9 @@ export class DataCollectService {
                 console.log("can't collect data (value is N/A)");
                 
                 if (retoryCount < 5) {
-                    console.log("retory collectTempAndHumid() ...")
-                    this.collectData(retoryCount++)
+                    retoryCount = retoryCount + 1
+                    console.log(`re-try ${retoryCount} collectTempAndHumid() ...`)
+                    this.collectData(retoryCount)
                 }
             } else {
                 const log: IRaspiSensorLog = {
