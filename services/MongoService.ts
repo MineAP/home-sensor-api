@@ -1,6 +1,5 @@
 import * as mongoDB from "mongodb";
 import { IRaspiCameraData, IRaspiCpuInfo, IRaspiSensorLog } from "../models/TestMongoModel"
-import { promises } from "dns";
 import { DataCollectService } from "./DataCollectService";
 import { MongoServerError } from "mongodb";
 
@@ -36,11 +35,11 @@ export async function connectToDatabase() {
     try {
 
         collections.raspiSensorLogs = sensorLogsCollection
-        collections.raspiSensorLogs.createIndex( { "timestamp": 1 }, { expireAfterSeconds: 60 * 60 * 24 * Number(db_store_expire_day) } )
+        await collections.raspiSensorLogs.createIndex( { "timestamp": 1 }, { expireAfterSeconds: 60 * 60 * 24 * Number(db_store_expire_day) } )
         collections.raspiCpuInfo = cpuInfoCollection
-        collections.raspiCpuInfo.createIndex( { "timestamp": 1 }, { expireAfterSeconds: 60 * 60 * 24 * Number(db_store_expire_day) } )
+        await collections.raspiCpuInfo.createIndex( { "timestamp": 1 }, { expireAfterSeconds: 60 * 60 * 24 * Number(db_store_expire_day) } )
         collections.raspiCameraData = cameraDataCollection
-        collections.raspiCameraData.createIndex( { "timestamp": 1 }, { expireAfterSeconds: 60 * 60 * 24 * Number(db_picture_store_expire_day) } )
+        await collections.raspiCameraData.createIndex( { "timestamp": 1 }, { expireAfterSeconds: 60 * 60 * 24 * Number(db_picture_store_expire_day) } )
         
         console.log(`Successfully connected to database: ${db.databaseName} `);
 
@@ -59,8 +58,10 @@ export async function connectToDatabase() {
 export class RaspiSensorLogsMongoService {
     public async select(start:Date, end:Date): Promise<IRaspiSensorLog[]> {
         const select = (await collections.raspiSensorLogs?.find({
-            $gte: start,
-            $lte: end,
+            timestamp: {
+                $gte: start,
+                $lte: end,
+            },
         }).toArray()) as IRaspiSensorLog[];
         return select;
     }
@@ -73,8 +74,10 @@ export class RaspiSensorLogsMongoService {
 export class RaspiCpuInfoMongoService {
     public async select(start:Date, end:Date): Promise<IRaspiCpuInfo[]> {
         const select = (await collections.raspiCpuInfo?.find({
-            $gte: start,
-            $lte: end,
+            timestamp: {
+                $gte: start,
+                $lte: end,
+            },
         }).toArray()) as IRaspiCpuInfo[];
         return select;
     }
@@ -99,8 +102,10 @@ export class RaspiCpuInfoMongoService {
 export class RaspiCameraDataMongoService {
     public async select(start:Date, end:Date): Promise<IRaspiCameraData[]> {
         const select = (await collections.raspiCameraData?.find({
-            $gte: start,
-            $lte: end,
+            timestamp: {
+                $gte: start,
+                $lte: end,
+            },
         }).toArray()) as IRaspiCameraData[];
         return select;
     }

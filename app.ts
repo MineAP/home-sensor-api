@@ -26,13 +26,13 @@ service.startTimer(Number.parseInt(interval_ms))
 //静的リソース
 app.use(express.static('public'));
 
+app.get('/', (req, res) => {
+    res.status(200).send({ message: 'Hello, world' });
+});
+
 //ルーティング
 const router = require('./routes/');
 app.use('/', router);
-
-app.get('/helloWorld', (req, res) => {
-    res.status(200).send({ message: 'hello, world' });
-});
 
 //サーバ起動
 const port = process.env.PORT || 3000; // port番号を指定

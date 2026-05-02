@@ -4,7 +4,7 @@ Node.js + Express + TypeScript + mongoDBで作ったRestAPIサーバー
 
 ## 動作環境
 
-- Nodejs: 18.16.1
+- Nodejs: 24
 - Express: 4.18.2
 - TypeScript: 5.1.6
 - mongoDB: 5.7
@@ -17,7 +17,7 @@ RaspberryPi4上で、以下のRestAPIサーバーが起動していること。
 ## Project Init
 
 ```sh
-npm install
+pnpm install
 ```
 
 ## Config
@@ -35,12 +35,16 @@ DB_NAME="homesensordb"
 ## How to run (debug)
 
 ```sh
-npx ts-node app.ts
+pnpm dev
 ```
 
 ## build & run
 
 ```sh
-npx tsc
-node app.js
+pnpm build
+pnpm start
 ```
+
+## 出力先
+
+TypeScript のビルド成果物は `build/` に出力されます。

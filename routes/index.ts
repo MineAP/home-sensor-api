@@ -1,19 +1,8 @@
 import express from 'express';
-import helmet from 'helmet';
-import cors from 'cors';
 import { RaspiCameraDataMongoService, RaspiCpuInfoMongoService, RaspiSensorLogsMongoService } from '../services/MongoService';
-import moment from 'moment';
-const app = express();
-app.use(helmet());
-app.use(cors());
-// ルーティングする
 const router = express.Router();
 
 // routerにルーティングの動作を記述する
-router.get('/helloWorld', (req, res) => {
-    res.status(200).send({ message: 'Hello, world' });
-});
-
 router.get('/sensorlogs/', (req, res, next) => {
   const count = Number(req.query.count) || 100
   const service = new RaspiSensorLogsMongoService();
@@ -86,7 +75,7 @@ router.get('/raspicameradata/img', (req, res, next) => {
 // -------------------------------------------------
 
 // いずれのルーティングにもマッチしない(==NOT FOUND)
-app.use((req, res) => {
+router.use((req, res) => {
     res.status(404);
     res.render('error', {
       param: {
